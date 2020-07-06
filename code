@@ -1,0 +1,477 @@
+import os
+import cv2
+import csv
+import numpy as np
+import random as rn
+import pandas as pd
+from scipy import ndimage
+import matplotlib.pyplot as plt
+from skimage.filters import sobel
+
+# Creating Type_details.csv File which contains the Type of the Subtype like Animal, Flower etc
+with open('Type_details.csv', 'w',newline='') as file:
+    
+    # Make writer to write in the CSV File
+    writer = csv.writer(file)
+    
+    # Writing Column Name in the CSV File
+    writer.writerow(['Type','Code'])
+    
+    # Make a list of Type that we want to write in the CSV File
+    Type=['Animal','Vehicle','Flower','Fruit','Furniture','Bird','Phone','Vegetable','Shoes','Cloths']
+    
+    # For loop that writes each Type Name and their corresponding Type Code in the CSV File
+    for i in range(len(Type)):
+        
+        # Writing Type Name and Type Code in the CSV File
+        writer.writerow([Type[i],i+1])
+
+        
+        
+# Creating Subtype_details.csv File which contains the Subtype of each Type like in Animal we have cat, dog, lion etc
+with open('Subtype_details.csv', 'w',newline='') as file:
+    
+    # Make writer to write in the CSV File
+    writer = csv.writer(file)
+    
+    # Writing Column Name in the CSV File
+    writer.writerow(['Subtype','Code'])
+    
+    # Make a list of Subtype of each Type that we want to write in the CSV File
+    subtype=['Cat','Dog','Lion','Tiger','Horse','Monkey','Cow','Goat','Panda','Bull'\
+          ,'Car','Boat','Train','Bus','Bike','Airplane','Tank','Submarine','Fighter_Jet','Cycle'\
+          ,'Rose','Lily','Holly','Jasmine','Daisy','Poppy','Alyssum','Iris','Violet','Ivy'\
+          ,'Apple','Orange','Banana','Lemon','Pineapple','Watermelon','Mango','Strawberry','Litchi','Kiwi'\
+          ,'Chair','Table','Cupboard','Bed','Desk','Bench','Blackboard','Sofa','Stand','Stool'\
+          ,'Pigeon','Crow','Parrot','Peacock','Dove','Sparrow','Owl','Ostrich','Turkey','Eagle'\
+          ,'Iphone','Samsung','HTC','Swipe','Nokia','Huwai','Honor','Vivo','Oppo','Realme'\
+          ,'Potato','Tomato','Carrot','Cucumber','Corn','Broccoli','Lady_Finger','Cabbage','Onion','Garlic'\
+          ,'Addidas','Nike','Puma','Reebok','Sparx','Skechers','Fila','Bata','Woodland','Leecooper'\
+          ,'Levi','Flying_Machine','Allen_Solly','Lee','Monte_Carlo','Van_Hausen','Wrangler','Peter_England','Raymond','Lakme']
+    
+    # For loop that writes each Subtype Name and their corresponding Subtype Code in the CSV File
+    for i in range(len(subtype)):
+        
+        # Writing Subtype Name and Subtype Code in the CSV File
+        writer.writerow([subtype[i],i+1])
+
+        
+        
+# Creating Processing_details.csv File which contains the different Processing like Blur, Rotation etc which we will perform on the images
+with open('Processing_details.csv', 'w',newline='') as file:
+    
+    # Make writer to write in the CSV File
+    writer = csv.writer(file)
+    
+    # Writing Column Name in the CSV File
+    writer.writerow(['Processing','Code'])
+    
+    # Make a list of Proccess that we want to perform on the Images
+    Processtype=['Blur','Rotation_45','Rotation_90','Rotation_180','Flip','Translate','Greying','Sharpening','Canny','Sobel']
+    
+    # For loop that writes each Process Name and their corresponding Process Code in the CSV File
+    for i in range(len(Processtype)):
+        
+        # Writing Process Name and Process Code in the CSV File
+        writer.writerow([Processtype[i],i+1])
+        
+# Type list that has all the subtype list by type wise
+Type = []
+
+# Creating 10*10 Matrix for counting the number of processes done in Each Subtype
+count = np.zeros((10,10),dtype=int)
+
+# List of Subtype which Animal Type has
+Animal = ['Cat','Dog','Lion','Tiger','Horse','Monkey','Cow','Goat','Panda','Bull']
+
+# Appending list of Animal Subtype into main list of Type
+Type.append(Animal)
+
+# List of Subtype which Vehicle Type has
+Vehicle = ['Car','Boat','Train','Bus','Bike','Airplane','Tank','Submarine','Fighter_Jet','Cycle']
+
+# Appending list of Vehicle Subtype into main list of Type
+Type.append(Vehicle)
+
+# List of Subtype which Flower Type has
+Flower = ['Rose','Lily','Holly','Jasmine','Daisy','Poppy','Alyssum','Iris','Violet','Ivy']
+
+# Appending list of Flower Subtype into main list of Type
+Type.append(Flower)
+
+# List of Subtype which Fruit Type has
+Fruit = ['Apple','Orange','Banana','Lemon','Pineapple','Watermelon','Mango','Strawberry','Litchi','Kiwi']
+
+# Appending list of Fruit Subtype into main list of Type
+Type.append(Fruit)
+
+# List of Subtype which Furniture Type has
+Furniture = ['Chair','Table','Cupboard','Bed','Desk','Bench','Blackboard','Sofa','Stand','Stool']
+
+# Appending list of Furniture Subtype into main list of Type
+Type.append(Furniture)
+
+# List of Subtype which Bird Type has
+Bird = ['Pigeon','Crow','Parrot','Peacock','Dove','Sparrow','Owl','Ostrich','Turkey','Eagle']
+
+# Appending list of Bird Subtype into main list of Type
+Type.append(Bird)
+
+# List of Subtype which Phone Type has
+Phone = ['Iphone','Samsung','HTC','Swipe','Nokia','Huwai','Honor','Vivo','Oppo','Realme']
+
+# Appending list of Phone Subtype into main list of Type
+Type.append(Phone)
+
+# List of Subtype which Vegetable Type has
+Vegetable = ['Potato','Tomato','Carrot','Cucumber','Corn','Broccoli','Lady_Finger','Cabbage','Onion','Garlic']
+
+# Appending list of Vegetable Subtype into main list of Type
+Type.append(Vegetable)
+
+# List of Subtype which Shoes Type has
+Shoes = ['Addidas','Nike','Puma','Reebok','Sparx','Skechers','Fila','Bata','Woodland','Leecooper']
+
+# Appending list of Shoes Subtype into main list of Type
+Type.append(Shoes)
+
+# List of Subtype which Cloths Type has
+Cloths = ['Levi','Flying_Machine','Allen_Solly','Lee','Monte_Carlo','Van_Hausen','Wrangler','Peter_England','Raymond','Lakme']
+
+# Appending list of Cloths Subtype into main list of Type
+Type.append(Cloths)
+
+# List of Process which was done on the Image. This list basic used to creation t1 CSV File
+Process_Detail = []
+
+# Serial Number that counting that How many Processes Done
+sr_no = 0
+
+# Reading Type_details.CSV File as a DaraFrame
+df_Type = pd.read_csv('Type_details.csv')
+
+# Reading Subtype_details.CSV File as a DaraFrame
+df_Subtype = pd.read_csv('Subtype_details.csv')
+
+# Reading Processing_details.CSV File as a DaraFrame
+df_Process = pd.read_csv('Processing_details.csv')
+
+# Showing Message to the User that Please wait for a moment to execute this code
+print('Please wait for a moment to execute this Code', end='\n\n\n\n')
+
+# For loop that runs for each Subtype
+for subtype in list(df_Subtype['Subtype']):
+
+    # List that have 5 Unique Randomly choosen Process
+    random_Process = []
+    
+    # while loop that choose 5 Unique Random Process
+    while len(random_Process) < 5:
+        
+        # Randomly choose 1 value from the list of Process that we have in the Processing_details.CSV File
+        choice_Process = rn.choice(list(df_Process['Processing']))
+        
+        # If Randomly taken Process is not already choosen then it Enters
+        if choice_Process not in random_Process :
+            
+            # Apeending Randomly Choosen Process into choice_Process list
+            random_Process.append(choice_Process)
+
+    # Reading subtype of .jpg image which was we already have in Original Folder
+    img = cv2.imread('./Original/' + subtype + '.jpg',1)
+    
+    # Creating path_type variable for defining a Folder and Image path Type means we have a Image of Animal Type then path_type value is Animal
+    path_type = ''
+    
+    # Creating path variable that defining a path of a Folder and Image
+    path = './'
+    
+    # For loop that runs length of the type list times
+    for j in range(len(Type)):
+        
+        # If current subtype is in Type[j] rows then it Enters
+        if subtype in Type[j]:
+            
+            # Initialise path_type as a Type of Image
+            path_type = list(df_Type['Type'])[j]
+            
+            # Concatenate path_type into path variable
+            path += path_type
+            
+            # Breaking loop if we find the Type of the current Subtype Image
+            break
+            
+    # Concatenate subtype name into path variable
+    path += ('/' + subtype)
+    
+    # Converting Image into RGB means Red Green Blue Scale
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+    
+    # For loop the runs for each randomly choosed Process which was in the random_Process
+    for process in random_Process:
+            
+        # process_path that contains the path of the Folder which we want to create
+        process_path = str(path) + '/'+ str(process) + '/'
+        
+        # Creating the Folder hierarchy in the current Folder or that Folder whcich have this Code File
+        os.makedirs(process_path)
+        
+        # image_path that contains the current Image path which we want to store this Image
+        image_path = str(process_path) + str(subtype) + '_' + str(process) + '.jpg'
+        
+        # Code that maintins each Process code and it's Starting from T
+        Code = 'T'
+        
+        # Type_Code which contains the current Image Type code
+        Type_Code = Code + str(list(df_Type[ df_Type['Type'] == path_type]['Code'])[0])
+        
+        # Subtype_Code which contains the current Image Subtype code
+        Subtype_Code = Type_Code + str(list(df_Subtype[ df_Subtype['Subtype'] == subtype]['Code'])[0])
+        
+        # Process_Code which contains the current Process Type code
+        Process_Code = Subtype_Code + str(list(df_Process[ df_Process['Processing'] == process]['Code'])[0])
+        
+        # Increment the Serial Number by value of 1 which leads that we will complete 1 Process
+        sr_no += 1
+        
+        # Appending this Process details into Process_Detail
+        Process_Detail.append([sr_no,subtype + '_' + process + '.jpg',process_path,path_type,Type_Code,subtype,Subtype_Code,process,Process_Code])
+        
+        # From Process Code Row we increment the count variable of the Type Code Columnn by 1 and from this we knew that rhis process is how many times done for this perticular type
+        count[list(df_Process[ df_Process['Processing'] == process]['Code'])[0]-1][list(df_Type[ df_Type['Type'] == path_type]['Code'])[0]-1] += 1
+        
+        # If current Process is Rotation_45 then it Enters
+        if 'Rotation_45' == process:
+            
+            # Rotating Image at an angle of 45
+            image = ndimage.rotate(img,45)
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+        
+        # If current Process is Rotation_90 then it Enters
+        if 'Rotation_90' == process:
+            
+            # Rotating Image at an angle of 90 and Counter Clock Wise (Anticlock Wise) Direction
+            image = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+
+        # If current Process is Rotation_180 then it Enters
+        if 'Rotation_180' == process:
+            
+            # Rotating Image at an angle of 180
+            image = cv2.rotate(img, cv2.ROTATE_180)
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+            
+        # If current Process is Blur then it Enters
+        if 'Blur' == process:
+            
+            # Bluring Image with the value of (10,10)
+            image = cv2.blur(img,(10,10))
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+
+        # If current Process is Rotation_180 then it Enters
+        if 'Flip' == process:
+            
+            # Flipping image Vertically (Up-Down)
+            image = cv2.flip(img, 0)
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+            
+        # If current Process is Greying then it Enters
+        if 'Greying' == process:
+            
+            # Converting Image into BGR Format
+            image = cv2.cvtColor(img,cv2.COLOR_RGB2BGR)
+            
+            # Coverting Image into Gery Scale or Grey Format
+            image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+            
+        # If current Process is Canny then it Enters
+        if 'Canny' == process:
+            
+            # Border Detecting with the method of Canny with the Threshold value of 100, 200
+            image = cv2.Canny(img,100,200)
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+            
+        # If current Process is Sobel then it Enters
+        if 'Sobel' == process:
+            
+            # Coverting current image into Grey Scale
+            image = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+            
+            # Border Detect with the method of Sobel
+            image = sobel(image)
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+        
+        # If current Process is Translate then it Enters
+        if 'Translate' == process:
+            
+            # Set height and width value from the Image using slicing of the img matrix value
+            height,width = img.shape[:2]
+            
+            # Ser quarter_height and quater_width for stating cordinate of translating image
+            quarter_height, quarter_width = height / 4, width / 4
+            
+            # Converting Value in 32 Bits float format
+            T = np.float32([[1, 0, quarter_width], [0, 1, quarter_height]])
+            
+            # Traslating Image with the scale of T and start from the value of width and height
+            image = cv2.warpAffine(img, T, (width, height))
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+
+        # If current Process is Sharpening then it Enters
+        if 'Sharpening' == process:
+            
+            # Blurruing Image using with guassian Function and with the sigma value of 3
+            blurred_f = ndimage.gaussian_filter(img, 3)
+            
+            # Filtering the Blur Image with the sigma value of 1
+            filter_blurred_f = ndimage.gaussian_filter(blurred_f, 1)
+            
+            # Set alpha value 30
+            alpha = 30
+            
+            # For Shaprening Image first we finding the difference between blur and filter and then we multiply that value with given alpha and by adding this value in the blur image we get sharpen image
+            image = blurred_f + alpha * (blurred_f - filter_blurred_f)
+            
+            # Saving Image at the path of image_path
+            cv2.imwrite(image_path,image)
+
+
+# Displaying Message that all Process are Done
+print('All Process are Done', end='\n\n')
+print('Please check the folder which has a Current Code File')
+
+# Creating DataFrame with the list value of the Process_Details
+df = pd.DataFrame(Process_Detail,columns=['Serial Number','File Name','Path','Type','Type Code','Subtype','Subtype Code','Processing','Processing Code'])
+
+# Converting this DataFrame into After_Process_Details.CSV File
+df.to_csv('After_Process_Details.csv')
+
+# Creating statistics list for the analyse of the After_Process_Detail.CSV
+statistics = []
+
+# List of all Type
+Type = list(df_Type['Type'])
+
+# List of all Process
+Process = list(df_Process['Processing'])
+
+# List of Sum of all the Process which gives How many times these Process done on the Image
+totalcount = count.sum(axis=1)
+
+# For loop that runs length of the list of count times
+for i in range(len(count)):
+    
+    # Creating list of Subcount which gives each row value
+    subcount = []
+    
+    # For loop that runs length of the list of each row of the count list times
+    for j in range(len(count[i])):
+        
+        # Appending the value of Type and Count of Process done on that Type of Image into subcount list
+        subcount.append((Type[j],count[i,j]))
+        
+    # Appending Process Name, Process Code, Total counts of Process means Hoe many times this Process will done and Final Data of subcount into the statistics list
+    statistics.append([Process[i],(i+1),totalcount[i],subcount])
+
+# Creating DataFrame with the list value of the statistics
+df_Statistics = pd.DataFrame(statistics,columns=['Processing', 'Processing Code', 'Count', 'List'])
+
+# Converting this DataFrame into Statistics.CSV File
+df_Statistics.to_csv('Statistics.csv')
+
+# Reading Statistics.csv File as a DataFrame using pandas
+df_Statistics = pd.read_csv('Statistics.csv')
+
+# Total Count of a Process Done on the Image
+count = list(df_Statistics['Count'])
+
+# list Count that has the count of each Process done on which Type
+count = []
+
+# list of label for display the legend on the Bar Graph
+label = []
+
+# list of all the Process done on each Type
+lst = list(df_Statistics['List'])
+
+# for loop that runs for each Process Type
+for i in lst:
+    
+    # Creating list Subcount for counting each Type for current Process
+    subcount = []
+    
+    # Converting this i into string
+    str(i)
+    
+    # First replace ',() value by space and then we split it
+    i = i.replace('\'', ' ').replace(', ', ' ').replace(')', ' ').replace('(', ' ').split() 
+    
+    # For loop that gives each Type count for each Process
+    for j in i[2::2] :
+        
+        # Appending count value into list of subcount
+        subcount.append(int(j))
+        
+    # For loop that gives all the Types for displaying legend on the Bar Graph
+    for j in i[1::2] :
+        
+        # Appending legend name into label list
+        label.append(j)
+        
+    # Appending final subcount value into count list
+    count.append(subcount)
+
+# Set w value for Shifting each Type of Bar in the Bar Graph
+w = 0.375
+
+# Coverting figure size into 20 inch * 16 inch
+plt.figure(figsize=(20,16))
+
+# For loop that making each bar
+for i,j in zip(count,label) :
+    
+    # Plotting Bar Graph
+    plt.bar(np.arange(1,11)-w,i,width=0.075,label=j)
+    
+    # Changing w value for plotting next Type of Bar in the Bar Graph
+    w -= 0.075
+    
+# Changing the value of X-Axis
+plt.xticks(np.arange(1,11),fontsize=16)
+
+# Changing the value of Y-Axis
+plt.yticks(np.arange(10),fontsize=16)
+
+# Displaying legend on the Plotted Graph
+plt.legend(loc=0,fontsize=12)
+
+# Displaying X-Axis label
+plt.xlabel('Processing Code',fontsize=32)
+
+# Displaying Y-Axis label
+plt.ylabel('Count',fontsize=32)
+
+# Displaying Title of a Bar Graph
+plt.title('Bar Graph',fontsize=64,y=1.05)
+
+# Displaying Bar Graph
+plt.show()
